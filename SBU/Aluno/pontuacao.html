@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pontuação</title>
+  <link rel="stylesheet" href="Totem/empr.css">
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo">
+  </div>
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container">
+    <h1>Sua Pontuação</h1>
+    <p>Preencha com seu RA para ver sua classificação como leitor.</p>
+
+    <form class="formulario-emp" action="/verificar-pontos" method="post">
+      <div class="grupo">
+        <label for="nome">Seu RA:</label>
+        <input id="nome" name="nome" type="text" placeholder="Digite aqui" required>
+      </div>
+
+      <button type="submit">Ver agora</button>
+    </form>
+  </div>
+
+</body>
+</html>

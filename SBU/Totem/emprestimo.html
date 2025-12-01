@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Totem - Devolução</title>
+  <link rel="stylesheet" href="empr.css">
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo">
+  </div>
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container">
+    <h1>Empréstimo de Livros</h1>
+    <p>Preencha as informações abaixo para retirar seu livro.</p>
+
+    <form class="formulario-emp" action="/totem-emprestar" method="post">
+      <div class="grupo">
+        <label for="nome">Seu RA:</label>
+        <input id="nome" name="nome" type="text" placeholder="Digite aqui" required>
+      </div>
+
+      <div class="grupo">
+        <label for="codigo">Código do Livro:</label>
+        <input id="codigo" name="codigo" type="text" placeholder="Digite aqui" required>
+      </div>
+
+      <button type="submit">Retirar</button>
+    </form>
+  </div>
+
+</body>
+</html>

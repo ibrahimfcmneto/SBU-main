@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Aluno - Biblioteca</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo da Faculdade">
+  </div>
+
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container">
+
+    <h1 class="titulo-form">Entrar</h1>
+    <p class="subtitulo">Preencha as informações abaixo para se cadastrar no sistema.</p>
+
+    <form action="/cadastrar" method="post">
+
+      <div class="grupo">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" placeholder="Digite aqui" required>
+      </div>
+
+      <div class="grupo">
+        <label for="ra">RA:</label>
+        <input type="text" id="ra" name="ra" placeholder="Digite aqui" required>
+      </div>
+
+      <button type="submit" class="btn-enviar">Cadastrar</button>
+
+    </form>
+  </div>
+
+</body>
+</html>

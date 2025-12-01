@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Livros - Biblioteca</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo da Faculdade">
+  </div>
+
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container">
+
+    <h1 class="titulo-form">Pontuação de Leitores</h1>
+    <p class="subtitulo">Preencha as informações abaixo para consultar a classificação de leitor de cada aluno.</p>
+
+    <form class="form-consulta" action="/consultar" method="post">
+
+      <div class="grupo">
+        <label for="ra">RA:</label>
+        <input type="text" id="ra" name="ra" placeholder="Digite aqui" required>
+      </div>
+
+      <button type="submit" class="btn-consultar">Consultar</button>
+
+    </form>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Empréstimos</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Estilo exclusivo para a tabela dessa página */
+    .tabela-container {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #004aad; /* Azul da PUC */
+        color: white;
+    }
+    tr:hover { background-color: #f1f1f1; }
+    .aviso-vazio {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo da Faculdade">
+  </div>
+
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container" style="max-width: 900px;">
+
+    <h1 class="titulo-form">Livros Pendentes de Devolução</h1>
+    <p class="subtitulo">Abaixo estão os alunos que retiraram livros e ainda não devolveram.</p>
+
+    <div class="tabela-container">
+        <table id="tabela-pendencias">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>RA</th>
+                    <th>Livro</th>
+                    <th>Retirado em</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+        
+        <p id="msg-vazio" class="aviso-vazio">Carregando dados...</p>
+    </div>
+
+    <br><br>
+    <div style="text-align: center;">
+        <a href="index.html" style="color: #333; text-decoration: none; font-weight: bold;">Voltar ao Menu</a>
+    </div>
+
+  </div>
+
+  <script>
+    fetch('/biblio-listar-pendencias')
+        .then(response => response.json())
+        .then(dados => {
+            const tbody = document.querySelector('#tabela-pendencias tbody');
+            const msgVazio = document.getElementById('msg-vazio');
+
+            msgVazio.innerText = "";
+
+            if (dados.length === 0) {
+                msgVazio.innerText = "Nenhum empréstimo pendente no momento.";
+                return;
+            }
+
+            
+            dados.forEach(item => {
+                const linha = `
+                    <tr>
+                        <td>${item.nome_aluno}</td>
+                        <td>${item.ra_aluno}</td>
+                        <td>${item.nome_livro} <br><small style="color:gray">(${item.codigo_livro})</small></td>
+                        <td>${item.data_saida}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += linha;
+            });
+        })
+        .catch(erro => {
+            console.error('Erro:', erro);
+            document.getElementById('msg-vazio').innerText = "Erro ao carregar a lista.";
+        });
+  </script>
+
+</body>
+</html>

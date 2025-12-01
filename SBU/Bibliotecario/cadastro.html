@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Livros</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="logo">
+    <img src="logo-puc.png" alt="Logo">
+  </div>
+  <div class="linha-colorida"></div>
+
+  <div class="cadastro-container">
+    <h1>Cadastro de Livros</h1>
+    <p>Preencha as informações abaixo para adicionar um novo livro ao acervo.</p>
+
+    <form action="/cadastrar-livro" method="POST">
+      
+      <div class="grupo">
+        <label for="nome">Nome do Livro:</label>
+        <input id="nome" name="titulo" type="text" placeholder="Digite aqui" required>
+      </div>
+
+      <div class="grupo">
+        <label for="codigo">Código do Livro:</label>
+        <input id="codigo" name="codigo_livro" type="text" placeholder="Digite aqui" required>
+      </div>
+
+      <div class="grupo">
+        <label for="genero">Gênero:</label>
+        <input id="genero" name="genero" type="text" placeholder="Digite aqui">
+      </div>
+
+      <div class="grupo">
+        <label for="autor">Autor:</label>
+        <input id="autor" name="autor" type="text" placeholder="Digite aqui">
+      </div>
+
+      <div class="grupo">
+        <label for="editora">Editora:</label>
+        <input id="editora" name="editora" type="text" placeholder="Digite aqui">
+      </div>
+
+      <div class="grupo">
+        <label for="exemplares">Número de Exemplares:</label>
+        <input id="exemplares" name="quantidade_total" type="number" min="1" step="1" placeholder="Digite aqui" required>
+      </div>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+  </div>
+
+</body>
+</html>
