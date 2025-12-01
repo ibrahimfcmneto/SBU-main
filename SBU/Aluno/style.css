@@ -362,3 +362,59 @@ button:hover, .btn:hover {
     border-radius: 8px;
     margin-bottom: 20px;
 }
+
+/* --- ESTILOS DA TABELA DE CONSULTA --- */
+.tabela-container {
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+thead {
+    background-color: #3498db;
+    color: white;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status de Disponibilidade */
+.status-disponivel {
+    color: #27ae60;
+    font-weight: bold;
+    background: #e8f6f3;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.status-indisponivel {
+    color: #e74c3c;
+    font-weight: bold;
+    background: #fadbd8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}

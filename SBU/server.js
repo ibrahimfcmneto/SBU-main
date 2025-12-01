@@ -347,6 +347,20 @@ function calcularNivel(pontos) {
     }
 }
 
+
+// --- ROTA DE LISTAR TODOS OS LIVROS (NECESSÁRIA PARA A TABELA) ---
+app.get('/listar-todos-livros', (req, res) => {
+    const sql = "SELECT * FROM Livros ORDER BY titulo ASC";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar livros:', err);
+            return res.status(500).json({ error: 'Erro ao buscar livros' });
+        }
+        res.json(results);
+    });
+});
+
 // INICIANDO O SERVIDOR
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);

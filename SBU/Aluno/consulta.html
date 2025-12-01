@@ -3,39 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Livros</title>
+  <title>Consultar Livros - Biblioteca</title>
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="logo">
-    <img src="logo-puc.png" alt="Logo da Faculdade">
-  </div>
-
-  <div class="linha-colorida"></div>
-
-  <div class="cadastro-container">
-
-    <h1 class="titulo-form">Consulta de Livros</h1>
-    <p class="subtitulo">Preencha as informações abaixo para consultar a disponibilidade de um livro.</p>
-
-    <form class="form-consulta" action="/aluno-verificar" method="POST">
-
-      <div class="grupo">
-        <label for="livro">Código do livro:</label>
-        <input type="text" id="livro" name="livro" placeholder="Digite o código (Ex: 1234)" required>
-      </div>
-
-      <button type="submit" class="btn-consultar">Consultar</button>
-
-    </form>
-    
-    <br>
-    <div style="text-align: center;">
-        <a href="index.html" style="color: #333; text-decoration: none;">Voltar ao Menu</a>
+  <div class="card" style="max-width: 900px;">
+    <div class="logo">
+      <img src="logo-puc.png" alt="Logo PUC">
     </div>
 
+    <h1>Acervo Completo</h1>
+    <p>Veja abaixo todos os livros disponíveis na nossa biblioteca.</p>
+
+    <form action="/aluno-verificar" method="post" style="display:flex; gap:10px; margin-bottom: 30px;">
+        <input id="livro" name="livro" type="text" placeholder="Pesquisar por código..." required style="margin-bottom:0;">
+        <button type="submit" style="width: auto; padding: 0 25px;">Buscar</button>
+    </form>
+
+    <div class="tabela-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Gênero</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-livros">
+                <tr>
+                    <td colspan="5" style="text-align:center;">Carregando livros...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/aluno/index.html" class="voltar-link">← Voltar ao início</a>
   </div>
+
+  <script>
+    async function carregarLivros() {
+        try {
+            const response = await fetch('/listar-todos-livros');
+            const livros = await response.json();
+
+            const tbody = document.getElementById('tabela-livros');
+            tbody.innerHTML = ''; 
+
+            livros.forEach(livro => {
+                const tr = document.createElement('tr');
+                
+                const disponivel = livro.quantidade_disponivel > 0;
+                const classeStatus = disponivel ? 'status-disponivel' : 'status-indisponivel';
+                const textoStatus = disponivel ? `Disponível (${livro.quantidade_disponivel})` : 'Esgotado';
+
+                tr.innerHTML = `
+                    <td><strong>${livro.codigo_livro}</strong></td>
+                    <td>${livro.titulo}</td>
+                    <td>${livro.autor || '-'}</td>
+                    <td>${livro.genero || '-'}</td>
+                    <td><span class="${classeStatus}">${textoStatus}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (livros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum livro encontrado.</td></tr>';
+            }
+
+        } catch (error) {
+            console.error('Erro:', error);
+            document.getElementById('tabela-livros').innerHTML = 
+                '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar livros.</td></tr>';
+        }
+    }
+
+    window.onload = carregarLivros;
+  </script>
 
 </body>
 </html>
