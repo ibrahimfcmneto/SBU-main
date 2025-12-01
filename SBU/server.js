@@ -17,7 +17,7 @@ app.use('/public', express.static('public'));
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'SENHA BANCO DE DADOS',      
+    password: 'Ib04092006@',      
     database: 'biblioteca_puc'
 });
 
@@ -196,18 +196,24 @@ app.post('/totem-emprestar', (req, res) => {
 });
 
 // --- ROTA DE DEVOLUÇÃO (TOTEM) ---
+// --- ROTA DE DEVOLUÇÃO (TOTEM) ---
 app.post('/totem-devolver', (req, res) => {
     const ra_aluno = req.body.nome; // Lembra que no HTML o name é "nome"
     const codigo_livro = req.body.codigo;
 
     // 1. Verificar se existe um empréstimo ABERTO (data_devolucao_real IS NULL)
+    // AQUI ESTAVA A LINHA QUE FALTOU:
     const checkSql = `
         SELECT id_emprestimo FROM Emprestimos 
         WHERE ra_aluno = ? AND codigo_livro = ? AND data_devolucao_real IS NULL
     `;
 
     db.query(checkSql, [ra_aluno, codigo_livro], (err, results) => {
-        if (err) return res.send('Erro no sistema.');
+        if (err) {
+            console.error(err);
+            return res.send('Erro no sistema ao verificar empréstimo.');
+        }
+
         if (results.length === 0) {
             return res.send('<h1>Nenhum empréstimo ativo encontrado para este RA e Livro.</h1><a href="/totem/devolucao.html">Voltar</a>');
         }
@@ -220,15 +226,15 @@ app.post('/totem-devolver', (req, res) => {
         const updateLivro = "UPDATE Livros SET quantidade_disponivel = quantidade_disponivel + 1 WHERE codigo_livro = ?";
         db.query(updateLivro, [codigo_livro]);
 
-        // 4. Dar pontos para o aluno (+10 pontos)
-        const updatePontos = "UPDATE Alunos SET pontos = pontos + 10 WHERE ra = ?";
+        // 4. Dar pontos para o aluno (+1 ponto)
+        const updatePontos = "UPDATE Alunos SET pontos = pontos + 1 WHERE ra = ?";
         db.query(updatePontos, [ra_aluno], (err) => {
             if (err) console.log("Erro ao dar pontos");
             
             res.send(`
                 <div style="text-align:center; font-family:sans-serif; padding:50px; background-color:#e8f5e9;">
                     <h1>Devolução Confirmada! 📚</h1>
-                    <h2>Você ganhou +10 pontos! 🌟</h2>
+                    <h2>Você ganhou +1 ponto! 🌟</h2>
                     <a href="/totem/devolucao.html">Voltar</a>
                 </div>
             `);
@@ -237,36 +243,109 @@ app.post('/totem-devolver', (req, res) => {
 });
 
 // --- ROTA DE VERIFICAR PONTOS ---
+// --- ROTA DE VERIFICAR PONTOS (VISUAL ATUALIZADO) ---
+// --- ROTA DE VERIFICAR PONTOS (COM CSS EXTERNO) ---
 app.post('/verificar-pontos', (req, res) => {
     const ra_aluno = req.body.nome;
-
     const sql = "SELECT nome, pontos FROM Alunos WHERE ra = ?";
 
     db.query(sql, [ra_aluno], (err, results) => {
         if (err) return res.send('Erro ao buscar pontos.');
         
+        // Cabeçalho padrão que inclui o link para o CSS
+        // Nota: O caminho é "/aluno/style.css" porque configuramos app.use('/aluno', express.static('Aluno'))
+        const head = `
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Resultado</title>
+                <link rel="stylesheet" href="/aluno/style.css"> 
+            </head>
+        `;
+
         if (results.length === 0) {
-            return res.send('<h1>RA não encontrado.</h1><a href="/aluno/pontuacao.html">Voltar</a>');
+            return res.send(`
+                <html>
+                    ${head}
+                    <body>
+                        <div class="card">
+                            <h1>Ops! 😕</h1>
+                            <p class="erro">RA <strong>${ra_aluno}</strong> não encontrado.</p>
+                            <p>Verifique se digitou corretamente.</p>
+                            <br>
+                            <a href="/aluno/pontuacao.html" class="btn">Tentar Novamente</a>
+                        </div>
+                    </body>
+                </html>
+            `);
         }
 
         const aluno = results[0];
-        
-        // Lógica simples de nível
-        let nivel = "Leitor Iniciante 🥉";
-        if (aluno.pontos > 50) nivel = "Leitor Prata 🥈";
-        if (aluno.pontos > 100) nivel = "Leitor Ouro 🥇";
+        const nivel = calcularNivel(aluno.pontos);
 
         res.send(`
-            <div style="text-align:center; font-family:sans-serif; padding:50px; background-color:#fff3cd;">
-                <h1>Olá, ${aluno.nome}!</h1>
-                <h2>Sua Pontuação: <strong>${aluno.pontos}</strong></h2>
-                <h3>Nível: ${nivel}</h3>
-                <br>
-                <a href="/aluno/pontuacao.html">Voltar</a>
+            <html>
+                ${head}
+                <body>
+                    <div class="card">
+                        <div class="logo"><img src="/aluno/logo-puc.png" alt="Logo"></div>
+                        <p>Olá, <strong>${aluno.nome}</strong>!</p>
+                        <h1>Sua Leitura</h1>
+                        
+                        <div class="destaque">${aluno.pontos}</div>
+                        <p style="margin-top: -20px; margin-bottom: 20px; color: #7f8c8d;">Livros lidos</p>
+                        
+                        <div class="nivel">${nivel}</div>
+                        <br>
+                        <a href="/aluno/pontuacao.html" class="btn">Voltar</a>
+                    </div>
+                </body>
+            </html>
+        `);
+    });
+});
+
+// --- ROTA DE CONSULTAR PONTUAÇÃO (BIBLIOTECÁRIO) ---
+app.post('/consultar', (req, res) => {
+    const ra_aluno = req.body.ra;
+    const sql = "SELECT nome, ra, pontos FROM Alunos WHERE ra = ?";
+
+    db.query(sql, [ra_aluno], (err, results) => {
+        if (err) return res.send('Erro ao consultar.');
+        if (results.length === 0) return res.send('<h1>Aluno não encontrado!</h1><a href="/biblio/pontuacao.html">Voltar</a>');
+
+        const aluno = results[0];
+        
+        // Usa a nova função de classificação
+        const nivel = calcularNivel(aluno.pontos);
+
+        res.send(`
+            <div style="text-align:center; padding:50px; font-family: sans-serif; background-color: #f0f8ff;">
+                <h1>Consulta de Leitor 📖</h1>
+                <p><strong>Nome:</strong> ${aluno.nome}</p>
+                <p><strong>RA:</strong> ${aluno.ra}</p>
+                <hr style="width: 50%; margin: 20px auto;">
+                <h2>Livros Lidos: <span style="color: #007bff; font-size: 1.5em;">${aluno.pontos}</span></h2>
+                <h3>Classificação: ${nivel}</h3>
+                <br><br>
+                <a href="/biblio/pontuacao.html" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">Nova Consulta</a>
             </div>
         `);
     });
 });
+
+// --- FUNÇÃO DE CLASSIFICAÇÃO (TABELA ATUALIZADA) ---
+function calcularNivel(pontos) {
+    if (pontos <= 5) {
+        return "Leitor Iniciante (Até 5 livros)";
+    } else if (pontos <= 10) {
+        return "Leitor Regular (6 a 10 livros)";
+    } else if (pontos <= 20) {
+        return "Leitor Ativo (11 a 20 livros)";
+    } else {
+        return "Leitor Extremo (Mais de 20 livros) 🏆";
+    }
+}
 
 // INICIANDO O SERVIDOR
 app.listen(port, () => {

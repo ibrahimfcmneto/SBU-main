@@ -226,3 +226,139 @@ body {
     border-color: #0055A4;
     outline: none;
 }
+
+/* SBU/Aluno/style.css */
+
+/* RESET E CORPO */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+}
+
+/* ESTILO DO CARTÃO (CARD) */
+.card {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* ELEMENTOS DE TEXTO E IMAGEM */
+.logo img {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+p {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+/* FORMULÁRIO */
+.grupo {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* BOTÃO PADRÃO */
+button, .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 15px;
+    background-color: #3498db; /* Azul PUC */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+    box-sizing: border-box; /* Garante que padding não aumente a largura */
+}
+
+button:hover, .btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* LINKS DE VOLTAR */
+.voltar-link {
+    display: block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.voltar-link:hover {
+    color: #3498db;
+}
+
+/* --- ESTILOS ESPECÍFICOS DO RESULTADO (USADOS PELO SERVER) --- */
+.destaque {
+    font-size: 4em;
+    color: #3498db;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.nivel {
+    background: #e8f6f3;
+    color: #27ae60;
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.erro {
+    color: #e74c3c;
+    background: #fadbd8;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
