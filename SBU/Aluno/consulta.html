@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consultar Livros - Biblioteca</title>
-  
+  <title>Acervo - Biblioteca</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="card" style="max-width: 900px;">
+  <div class="cadastro-container" style="max-width: 900px; display: none;" id="conteudo-protegido">
+    
     <div class="logo">
-      <img src="logo-puc.png" alt="Logo PUC">
+        <img src="logo-puc.png" alt="Logo PUC">
+    </div>
+    
+    <div class="linha-colorida"></div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">Acervo Completo</h1>
+        <p style="margin: 0; color: #004aad; font-weight: bold;">
+            Olá, <span id="nome-usuario">Aluno</span> 👋
+        </p>
     </div>
 
-    <h1>Acervo Completo</h1>
-    <p>Veja abaixo todos os livros disponíveis na nossa biblioteca.</p>
+    <p>Confira a lista de todos os livros disponíveis na biblioteca.</p>
 
-    <form action="/aluno-verificar" method="post" style="display:flex; gap:10px; margin-bottom: 30px;">
-        <input id="livro" name="livro" type="text" placeholder="Pesquisar por código..." required style="margin-bottom:0;">
-        <button type="submit" style="width: auto; padding: 0 25px;">Buscar</button>
-    </form>
-
-    <div class="tabela-container">
+    <div class="tabela-container" style="display: block;">
         <table>
             <thead>
                 <tr>
@@ -35,53 +38,90 @@
             </thead>
             <tbody id="tabela-livros">
                 <tr>
-                    <td colspan="5" style="text-align:center;">Carregando livros...</td>
+                    <td colspan="5" style="text-align:center;">Carregando acervo...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <a href="/aluno/index.html" class="voltar-link">← Voltar ao início</a>
+    <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+        <a href="index.html" class="voltar-link">Voltar ao Menu</a>
+        <span style="color:#ccc">|</span>
+        <a href="#" onclick="sair()" class="voltar-link" style="color: red;">Sair</a>
+    </div>
+  </div>
+
+  <div id="loading" style="text-align:center; margin-top:50px;">
+      <h2>Verificando acesso... 🔒</h2>
   </div>
 
   <script>
-    async function carregarLivros() {
-        try {
-            const response = await fetch('/listar-todos-livros');
-            const livros = await response.json();
-
-            const tbody = document.getElementById('tabela-livros');
-            tbody.innerHTML = ''; 
-
-            livros.forEach(livro => {
-                const tr = document.createElement('tr');
-                
-                const disponivel = livro.quantidade_disponivel > 0;
-                const classeStatus = disponivel ? 'status-disponivel' : 'status-indisponivel';
-                const textoStatus = disponivel ? `Disponível (${livro.quantidade_disponivel})` : 'Esgotado';
-
-                tr.innerHTML = `
-                    <td><strong>${livro.codigo_livro}</strong></td>
-                    <td>${livro.titulo}</td>
-                    <td>${livro.autor || '-'}</td>
-                    <td>${livro.genero || '-'}</td>
-                    <td><span class="${classeStatus}">${textoStatus}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            if (livros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum livro encontrado.</td></tr>';
-            }
-
-        } catch (error) {
-            console.error('Erro:', error);
-            document.getElementById('tabela-livros').innerHTML = 
-                '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar livros.</td></tr>';
-        }
+    // --- FUNÇÃO DE LOGOUT ---
+    function sair() {
+        sessionStorage.clear();
+        window.location.href = 'index.html';
     }
 
-    window.onload = carregarLivros;
+    // --- AO CARREGAR A PÁGINA ---
+    window.onload = function() {
+        // 1. O "SEGURANÇA": Verifica se o aluno já entrou
+        const raLogado = sessionStorage.getItem('usuario_ra');
+        const nomeLogado = sessionStorage.getItem('usuario_nome');
+
+        if (!raLogado) {
+            // Se não tem RA salvo, manda para a tela de entrar
+            // E avisa que o destino é 'consulta' para ele voltar pra cá depois
+            alert("Acesso restrito! Por favor, identifique-se primeiro.");
+            window.location.href = 'entrar-aluno.html?destino=consulta';
+            return;
+        }
+
+        // 2. Se passou pelo segurança, mostra a tela
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('conteudo-protegido').style.display = 'block';
+        
+        // Preenche o nome do aluno
+        if(nomeLogado) {
+            document.getElementById('nome-usuario').innerText = nomeLogado;
+        }
+
+        // 3. Busca os livros no servidor (Mesma lógica de antes)
+        fetch('/listar-todos-livros')
+            .then(response => response.json())
+            .then(livros => {
+                const tbody = document.getElementById('tabela-livros');
+                tbody.innerHTML = ''; 
+
+                if (livros.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum livro encontrado.</td></tr>';
+                    return;
+                }
+
+                livros.forEach(livro => {
+                    const tr = document.createElement('tr');
+                    
+                    const disponivel = livro.quantidade_disponivel > 0;
+                    const textoStatus = disponivel ? `Disponível (${livro.quantidade_disponivel})` : 'Esgotado';
+                    const estiloStatus = disponivel 
+                        ? 'color: #27ae60; font-weight: bold; background: #e8f6f3; padding: 5px 10px; border-radius: 15px;' 
+                        : 'color: #c0392b; font-weight: bold; background: #fadbd8; padding: 5px 10px; border-radius: 15px;';
+
+                    tr.innerHTML = `
+                        <td><strong>${livro.codigo_livro}</strong></td>
+                        <td>${livro.titulo}</td>
+                        <td>${livro.autor || '-'}</td>
+                        <td>${livro.genero || '-'}</td>
+                        <td><span style="${estiloStatus}">${textoStatus}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                document.getElementById('tabela-livros').innerHTML = 
+                    '<tr><td colspan="5" style="text-align:center; color:red;">Erro de conexão com o servidor.</td></tr>';
+            });
+    };
   </script>
 
 </body>

@@ -3,30 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minha Pontuação - Biblioteca</title>
+  <title>Minha Pontuação</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="card">
+  <div class="card" id="conteudo-pontos" style="display: none;">
     <div class="logo">
       <img src="logo-puc.png" alt="Logo PUC">
     </div>
 
-    <h1>Consultar Pontuação</h1>
-    <p>Digite o seu RA para descobrir o seu nível de leitor.</p>
-
-    <form action="/verificar-pontos" method="post">
-      <div class="grupo">
-        <label for="nome">Seu RA:</label>
-        <input id="nome" name="nome" type="text" placeholder="Ex: 123456" required>
-      </div>
-
-      <button type="submit">Ver Classificação 🏆</button>
-    </form>
-
-    <a href="/aluno/index.html" class="voltar-link">← Voltar ao início</a>
+    <p>Olá, <strong id="nome-aluno">...</strong>!</p>
+    <h1>Sua Leitura</h1>
+    
+    <div class="destaque" id="pontos-aluno">...</div>
+    <p style="margin-top: -20px; margin-bottom: 20px; color: #7f8c8d;">Livros lidos</p>
+    
+    <div class="nivel" id="nivel-aluno">...</div>
+    <br>
+    <a href="index.html" class="btn">Sair</a>
   </div>
+
+  <div id="loading" style="text-align:center; margin-top:50px;">
+      <h2>Carregando informações...</h2>
+  </div>
+
+  <script>
+    window.onload = async function() {
+        // 1. Verifica se tem alguém logado
+        const raLogado = sessionStorage.getItem('usuario_ra');
+
+        if (!raLogado) {
+            // Se não tiver logado, chuta de volta para o Entrar
+            alert("Você precisa entrar primeiro!");
+            window.location.href = 'entrar-aluno.html?destino=pontos';
+            return;
+        }
+
+        // 2. Busca os dados atualizados no servidor
+        try {
+            const resposta = await fetch(`/api-pontos/${raLogado}`);
+            const dados = await resposta.json();
+
+            // 3. Preenche a tela
+            document.getElementById('nome-aluno').innerText = dados.nome;
+            document.getElementById('pontos-aluno').innerText = dados.pontos;
+            document.getElementById('nivel-aluno').innerText = dados.nivel;
+
+            // Mostra o cartão e esconde o loading
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('conteudo-pontos').style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao carregar dados.");
+        }
+    };
+  </script>
 
 </body>
 </html>

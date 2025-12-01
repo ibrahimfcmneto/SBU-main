@@ -6,6 +6,7 @@ const port = 3000;
 
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Configuração das pastas (Rotas estáticas)
 app.use('/aluno', express.static('Aluno'));
@@ -383,6 +384,46 @@ app.get('/biblio-todos-emprestimos', (req, res) => {
             return res.status(500).json({ erro: 'Erro ao buscar histórico' });
         }
         res.json(results);
+    });
+});
+
+// --- ROTA DE LOGIN DO ALUNO (Valida Nome e RA) ---
+app.post('/login-aluno', (req, res) => {
+    // Agora com 'app.use(express.json())', isto vai funcionar:
+    const { nome, ra } = req.body; 
+
+    const sql = "SELECT * FROM Alunos WHERE nome = ? AND ra = ?";
+    
+    db.query(sql, [nome, ra], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ erro: 'Erro no servidor' });
+        }
+
+        if (results.length > 0) {
+            res.json({ sucesso: true, aluno: results[0] });
+        } else {
+            res.json({ sucesso: false, mensagem: 'Nome ou RA incorretos.' });
+        }
+    });
+});
+
+// --- ROTA DE API DE PONTOS ---
+app.get('/api-pontos/:ra', (req, res) => {
+    const ra = req.params.ra;
+    
+    db.query("SELECT * FROM Alunos WHERE ra = ?", [ra], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(404).json({ erro: 'Aluno não encontrado' });
+        }
+        const aluno = results[0];
+        const nivel = calcularNivel(aluno.pontos); // Certifique-se que a função existe
+        
+        res.json({ 
+            nome: aluno.nome, 
+            pontos: aluno.pontos, 
+            nivel: nivel 
+        });
     });
 });
 

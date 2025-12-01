@@ -3,38 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro de Aluno - Biblioteca</title>
+  <title>Acesso Aluno</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="logo">
-    <img src="logo-puc.png" alt="Logo da Faculdade">
+    <img src="logo-puc.png" alt="Logo PUC">
   </div>
-
   <div class="linha-colorida"></div>
 
   <div class="cadastro-container">
+    <h1 class="titulo-form">Área do Aluno</h1>
+    <p class="subtitulo">Identifique-se para acessar o sistema.</p>
 
-    <h1 class="titulo-form">Entrar</h1>
-    <p class="subtitulo">Preencha as informações abaixo para se cadastrar no sistema.</p>
-
-    <form action="/cadastrar" method="post">
-
+    <form id="form-login">
+      
       <div class="grupo">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome" placeholder="Digite aqui" required>
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome" name="nome" placeholder="Igual ao cadastro..." required>
       </div>
 
       <div class="grupo">
-        <label for="ra">RA:</label>
-        <input type="text" id="ra" name="ra" placeholder="Digite aqui" required>
+        <label for="ra">Registro Acadêmico (RA):</label>
+        <input type="text" id="ra" name="ra" placeholder="Digite seu RA..." required>
       </div>
 
-      <button type="submit" class="btn-enviar">Cadastrar</button>
+      <p id="mensagem-erro" style="color: red; font-weight: bold; display: none;"></p>
 
+      <button type="submit" class="btn-enviar">Acessar Sistema ➔</button>
     </form>
+    
+    <a href="index.html" class="voltar-link">← Voltar</a>
   </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const destino = params.get('destino') || 'pontuacao'; // Padrão vai para pontuação se não tiver destino
+
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Não recarrega a página
+
+        const nome = document.getElementById('nome').value;
+        const ra = document.getElementById('ra').value;
+        const msgErro = document.getElementById('mensagem-erro');
+
+        try {
+            // Pergunta ao servidor se os dados estão certos
+            const resposta = await fetch('/login-aluno', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, ra })
+            });
+
+            const dados = await resposta.json();
+
+            if (dados.sucesso) {
+                // SUCESSO: Guarda o RA na "sessão" do navegador
+                sessionStorage.setItem('usuario_ra', dados.aluno.ra);
+                sessionStorage.setItem('usuario_nome', dados.aluno.nome);
+
+                // Redireciona para onde o aluno queria ir
+                if (destino === 'consulta') {
+                    window.location.href = 'consulta.html';
+                } else {
+                    window.location.href = 'pontuacao.html';
+                }
+            } else {
+                // ERRO: Mostra mensagem
+                msgErro.style.display = 'block';
+                msgErro.innerText = "❌ " + dados.mensagem;
+            }
+        } catch (error) {
+            console.error(error);
+            msgErro.style.display = 'block';
+            msgErro.innerText = "Erro ao conectar com o servidor.";
+        }
+    });
+  </script>
 
 </body>
 </html>
